@@ -17,6 +17,21 @@ def fetch_from_Haas():
             # dsrdtr = , # True or False
             # inter_byte_timeout = 
         )
+        try:
+            ser.open()
+        except serial.SerialException:
+            if ser.is_open:
+                try:
+                    print("Port was open. Attempting to close.")
+                    ser.close()
+                    time.sleep(2)
+                    ser.open()
+                except:
+                    print("Port is already open. Failed to close. Try again.")
+                    #event.clear()
+            else:
+                print("Failed to connect to serial port. Make sure it is free or it exists. Try again.")
+                #event.clear()
 
         # Checks if serial port is open
         if ser.is_open(): #it might be ser.is_open:
@@ -49,3 +64,5 @@ def fetch_from_Haas():
     #         print("Serial port closed")
 
             ser.close()
+
+fetch_from_Haas()

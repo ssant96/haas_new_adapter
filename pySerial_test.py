@@ -3,7 +3,6 @@ import time
 
 """Function that reads data from serial (through Rasp. Pi) and parses the data"""
 def fetch_from_Haas():
-    try:
         # Create serial object
         ser = serial.Serial(
             port = '/dev/ttyUSB0',
@@ -27,19 +26,26 @@ def fetch_from_Haas():
     
         # Data extraction from Haas
         while True:
-            if ser.in_waiting > 0:
-                data = ser.readline().decode('uft-8').strip()
-
-                print(f"Data: {data}")
-
-            time.sleep(1)
-
-    # Sends error message if Haas serial communication failed
-    except serial.SerialException as e:
-        print("Failed to communicate with Haas: ", str(e))
+            out = ''
+            try:
+                # Read Statys
+                ser.write(b"Q500\r")
+                status = ser.readline()
+                status = status[2:-3]
+                print(status)
+            except:
+                print("Failed to fetch values from machine")
     
-    finally:
-        # Closes serial port
-        if ser.is_open():
+    
+    # Sends error message if Haas serial communication failed
+    # except serial.SerialException as e:
+    #     print("Failed to communicate with Haas: ", str(e))
+    #     time.sleep(2)
+    
+    # finally:
+    #     # Closes serial port
+    #     if ser.is_open():
+    #         ser.close()
+    #         print("Serial port closed")
+
             ser.close()
-            print("Serial port closed")

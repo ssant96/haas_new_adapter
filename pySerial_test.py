@@ -19,8 +19,9 @@ def fetch_from_Haas():
         )
         try:
             ser.open()
-        except serial.SerialException:
-            if ser.is_open:
+        except serial.SerialException as a:
+            print(str(a))
+            if ser.isOpen():
                 try:
                     print("Port was open. Attempting to close.")
                     ser.close()
@@ -34,7 +35,7 @@ def fetch_from_Haas():
                 #event.clear()
 
         # Checks if serial port is open
-        if ser.is_open(): #it might be ser.is_open:
+        if ser.isOpen(): #it might be ser.is_open:
             print("Serial port is open!")
         else:
             print("Error with serial port opening")
@@ -44,12 +45,12 @@ def fetch_from_Haas():
             out = ''
             try:
                 # Read Statys
-                ser.write(b"Q500\r")
+                ser.write(b"Q500\r\n")
                 status = ser.readline()
                 status = status[2:-3]
                 print(status)
-            except:
-                print("Failed to fetch values from machine")
+            except Exception as e:
+                print(str(e))
     
     
     # Sends error message if Haas serial communication failed

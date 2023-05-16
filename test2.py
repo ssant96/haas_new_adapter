@@ -17,7 +17,7 @@ def fetch_from_Haas():
         while True:
             # Read Coolant Level
             try:
-                ser.write(b"?Q600 1094\r\n")
+                ser.write(b"?Q600 1094\r\n") 
                 coolant = ser.readline()
                 coolant = str(float(coolant[15:26]))
                 print(f"coolant is: {coolant}")

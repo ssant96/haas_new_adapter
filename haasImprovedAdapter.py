@@ -4,6 +4,7 @@ import time
 import socket
 import serial
 import datetime
+import traceback
 
 client_counter = 0
 client_list = []
@@ -11,6 +12,9 @@ first_run_flag = 1
 lock = threading.Lock()
 event = threading.Event()
 event.set()
+
+# Initialization of global attributes
+combined_output = ""
 
 # ---------------Socket connection begins----------------#
 """Socket Objects Init"""
@@ -37,14 +41,14 @@ def clear_thread_list():
     while True:
         try:
             if client_counter == 0 and first_run_flag == 0 and client_list != []:
-                print("%d Clients Active" % client_counter)
-                # print(f"{client_counter} Clients Active") ---> more updated code
+                #print("%d Clients Active" % client_counter)
+                print(f"{client_counter} Clients Active") #---> more updated code
                 print("Clearing All Threads....")
                 for index, thread in enumerate(client_list):
                     thread.join()
                 client_list = []
-        except:
-            print("Error with Client List Deletion")
+        except Exception as e:
+            print("Error with Client List Deletion: ", e)
 # ---------------Socket connection ends-------------------#
 
 
@@ -61,11 +65,13 @@ def readData(ser, HAASCode):
         value = value.split(",")[2].strip()
         value = value.replace(chr(23), '')
     except Exception as ex:
-        print(ex)
+        #print(ex)
+        traceback.print_exc()
         value = 'Unavailable'
     return value
 
 def fetch_from_Haas():
+        global combined_output
         # Create serial object
         ser = serial.Serial(
             port = '/dev/ttyUSB0',
@@ -189,7 +195,8 @@ def fetch_from_Haas():
             # Error catch
             except Exception as ex:
                 print("Failed fetching values from machine: ")
-                print(ex)
+                #print(ex)
+                traceback.print_exc()
                 time.sleep(2)
 
             
@@ -217,7 +224,6 @@ class NewClientThread(threading.Thread):
             try:
                 # print("Sending data to Client {} in {}".format(self.client_ip, self.getName()))
                 out = combined_output
-                print("OUT1:")
                 print("OUT: " + out)
                 self.connection_object.sendall(out.encode())
                 time.sleep(0.5)
@@ -225,9 +231,11 @@ class NewClientThread(threading.Thread):
             except Exception as err:
                 lock.acquire()
                 try:
-                    print(err)
+                    #print(err)
+                    traceback.print_exc()
                     client_counter = client_counter - 1
-                    print("Connection disconnected for ip {} ".format(self.client_ip))
+                    #print("Connection disconnected for ip {} ".format(self.client_ip))
+                    print(f"Connection disconnected for ip {self.client_ip} ") #---> More updated code
                     break
                 finally:
                     lock.release()

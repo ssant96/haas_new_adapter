@@ -5,15 +5,14 @@ import socket
 import serial
 import datetime
 
+# Initialization of global attributes
 client_counter = 0
 client_list = []
 first_run_flag = 1
+combined_output = ""
 lock = threading.Lock()
 event = threading.Event()
 event.set()
-
-# Initialization of global attributes
-combined_output = ""
 
 # ---------------Socket connection begins----------------#
 """Socket Objects Init"""
@@ -69,6 +68,7 @@ def readData(ser, HAASCode):
     return value
 
 def fetch_from_Haas():
+        global combined_output
         # Create serial object
         ser = serial.Serial(
             port = '/dev/ttyUSB0',
@@ -94,10 +94,8 @@ def fetch_from_Haas():
         zWorkPrevious = "novalue"
         aWorkPrevious = "novalue"
         bWorkPrevious = "novalue"
-        combined_output = ""
 
         while True:
-            updated = False
             try:
                 # Combines all output into one at the end
                 outString = ""
@@ -195,9 +193,6 @@ def fetch_from_Haas():
                 print("Failed fetching values from machine: ")
                 print(ex)
                 time.sleep(2)
-
-            
-        ser.close()
 # ---------------Haas Data Extraction ends-------------------#
 
 

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<MTConnectDevices xmlns="urn:mtconnect.org:MTConnectDevices:1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:mtconnect.org:MTConnectDevices:1.7 schema/MTConnectDevices_1.7.xsd">
+<MTConnectDevices xmlns="urn:mtconnect.org:MTConnectDevices:1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="urn:mtconnect.org:MTConnectDevices:1.7 schema/MTConnectDevices_1.7.xsd">
   <Header version="1.7.0" creationTime="2021-11-9T00:00:00Z" instanceId="1" sender="vt-data-02" bufferSize="131111" assetBufferSize="1000" assetCount="0"/>
 	<Devices>
 		<Device id="d1" uuid="Haas-VF3" name="Haas-VF3">
 			<Description>Haas-VF3</Description>
-			<DataItems>
-				<DataItem category="EVENT" name="machineAvail" type="AVAILABILITY"/>
-			</DataItems>
 			<Components>
 				<Axes id="a" name="base">
 					<Components>

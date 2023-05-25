@@ -13,6 +13,7 @@ combined_output = ""
 lock = threading.Lock()
 event = threading.Event()
 event.set()
+data_update_event = threading.Event()
 
 # ---------------Socket connection begins----------------#
 """Socket Objects Init"""
@@ -88,7 +89,7 @@ def readData(ser, HAASCode):
     return value
 
 def fetch_from_Haas():
-        global combined_output
+        global combined_output, data_update_event
         # Create serial object (Note that these are the values configurable on Haas)
         # To ensure data collection works, the values have to be matching each other.
         ser = serial.Serial(
@@ -137,6 +138,7 @@ def fetch_from_Haas():
                     coolantPrevious = coolant
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"coolant: {coolant}")
                 # print(f"combined output is {combined_output}")
@@ -149,6 +151,7 @@ def fetch_from_Haas():
                     spindleSpeedPrevious = spindleSpeed
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"spindleSpeed: {spindleSpeed}")
                 # print(f"combined output is {combined_output}")
@@ -161,6 +164,7 @@ def fetch_from_Haas():
                     xMachinePrevious = xMachine
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"xMachine: {xMachine}")
                 # print(f"combined output is {combined_output}")
@@ -173,6 +177,7 @@ def fetch_from_Haas():
                     yMachinePrevious = yMachine
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"yMachine: {yMachine}")
                 # print(f"combined output is {combined_output}")
@@ -185,6 +190,7 @@ def fetch_from_Haas():
                     zMachinePrevious = zMachine
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"zMachine: {zMachine}")
                 # print(f"combined output is {combined_output}")
@@ -197,6 +203,7 @@ def fetch_from_Haas():
                     aMachinePrevious = aMachine
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"aMachine: {aMachine}")
                 # print(f"combined output is {combined_output}")
@@ -209,6 +216,7 @@ def fetch_from_Haas():
                     bMachinePrevious = bMachine
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"bMachine: {bMachine}")
                 # print(f"combined output is {combined_output}")
@@ -221,6 +229,7 @@ def fetch_from_Haas():
                     xWorkPrevious = xWork
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"xWork: {xWork}")
                 # print(f"combined output is {combined_output}")
@@ -233,6 +242,7 @@ def fetch_from_Haas():
                     yWorkPrevious = yWork
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"yWork: {yWork}")
                 # print(f"combined output is {combined_output}")
@@ -245,6 +255,7 @@ def fetch_from_Haas():
                     zWorkPrevious = zWork
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"zWork: {zWork}")
                 # print(f"combined output is {combined_output}")
@@ -257,6 +268,7 @@ def fetch_from_Haas():
                     aWorkPrevious = aWork
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"aWork: {aWork}")
                 # print(f"combined output is {combined_output}")
@@ -269,6 +281,7 @@ def fetch_from_Haas():
                     bWorkPrevious = bWork
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
+                    data_update_event.set()
                     outString = ""
                 # print(f"bWork: {bWork}")
                 # print(f"combined output is {combined_output}")
@@ -300,18 +313,17 @@ class NewClientThread(threading.Thread):
 
     # run method called on .start() execution
     def run(self):
-        global client_counter, combined_output
+        global client_counter, combined_output, data_update_event
         global lock
-        combined_outputPrevious = ""
         while True:
             try:
                 # print("Sending data to Client {} in {}".format(self.client_ip, self.getName()))
-                if combined_output != combined_outputPrevious:
-                    out = combined_output
-                    print("OUT: " + out)
-                    self.connection_object.sendall(out.encode())
-                    combined_outputPrevious = combined_output
-                    time.sleep(0.5)
+                data_update_event.wait()  # wait for data to change
+                out = combined_output
+                print("OUT: " + out)
+                self.connection_object.sendall(out.encode())
+                data_update_event.clear()
+                time.sleep(0.5)
 
             except Exception as err:
                 lock.acquire()

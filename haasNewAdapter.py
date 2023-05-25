@@ -138,6 +138,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"coolant: {coolant}")
+                print(f"combined output is {combined_output}")
 
                 # Spindle Speed
                 spindleSpeed = readData(ser, "3027")
@@ -147,6 +148,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"spindleSpeed: {spindleSpeed}")
+                print(f"combined output is {combined_output}")
 
                 # X machine
                 xMachine = readData(ser, "5021")
@@ -156,6 +158,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"xMachine: {xMachine}")
+                print(f"combined output is {combined_output}")
 
                 # Y machine
                 yMachine = readData(ser, "5022")
@@ -165,6 +168,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"yMachine: {yMachine}")
+                print(f"combined output is {combined_output}")
 
                 # Z machine
                 zMachine = readData(ser, "5023")
@@ -174,6 +178,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"zMachine: {zMachine}")
+                print(f"combined output is {combined_output}")
 
                 # A machine
                 aMachine = readData(ser, "5024")
@@ -183,6 +188,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"aMachine: {aMachine}")
+                print(f"combined output is {combined_output}")
 
                 # B machine
                 bMachine = readData(ser, "5025")
@@ -192,6 +198,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"bMachine: {bMachine}")
+                print(f"combined output is {combined_output}")
 
                 # X work
                 xWork = readData(ser, "5041")
@@ -201,6 +208,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"xWork: {xWork}")
+                print(f"combined output is {combined_output}")
 
                 # Y work
                 yWork = readData(ser, "5042")
@@ -210,6 +218,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"yWork: {yWork}")
+                print(f"combined output is {combined_output}")
 
                 # Z work
                 zWork = readData(ser, "5043")
@@ -219,6 +228,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"zWork: {zWork}")
+                print(f"combined output is {combined_output}")
 
                 # A work
                 aWork = readData(ser, "5044")
@@ -228,6 +238,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"aWork: {aWork}")
+                print(f"combined output is {combined_output}")
 
                 # B work
                 bWork = readData(ser, "5045")
@@ -237,6 +248,7 @@ def fetch_from_Haas():
                     # time stamp for more accurate readings
                     combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"bWork: {bWork}")
+                print(f"combined output is {combined_output}")
 
                 # Final data purge (Might not be needed)
                 # combined_output = '\r\n' + datetime.datetime.now().isoformat() + 'Z' + outString
@@ -272,7 +284,7 @@ class NewClientThread(threading.Thread):
                 out = combined_output
                 print("OUT: " + out)
                 self.connection_object.sendall(out.encode())
-                time.sleep(0.5)
+                #time.sleep(0.5) # removed to send data faster
 
             except Exception as err:
                 lock.acquire()

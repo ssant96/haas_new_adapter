@@ -89,13 +89,23 @@ def readData(ser, HAASCode):
 
 def fetch_from_Haas():
         global combined_output
-        # Create serial object
+        # Create serial object (Note that these are the values configurable on Haas)
+        # To ensure data collection works, the values have to be matching each other.
         ser = serial.Serial(
+            # USB connection linux-based
             port = '/dev/ttyUSB0',
-            baudrate = 9600,
+            # Haas Baud Rate:50/110/200/300/600/1200/2400/4800/7200/9600/19200/38400/115200
+            baudrate = 115200,
+            # Haas RS-232 Data Bits options: SEVENBITS or 
             bytesize = serial.SEVENBITS,
-            timeout = 1,
-            xonxoff = False
+            # Haas Stop Bit options: ONE or TWO
+            stopbits = serial.STOPBITS_ONE,
+            # Currently set to xonxoff
+            xonxoff = False,
+            # Haas parity options: NONE/ZERO/EVEN/ODD
+            parity = serial.PARITY_NONE,
+            # Independent from Haas
+            timeout = 1
         )
 
         # Buffer for testing purposes
@@ -125,6 +135,8 @@ def fetch_from_Haas():
                 if coolant != coolantPrevious:
                     outString += "|coolant|"+coolant
                     coolantPrevious = coolant
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"coolant: {coolant}")
 
                 # Spindle Speed
@@ -132,6 +144,8 @@ def fetch_from_Haas():
                 if spindleSpeed != spindleSpeedPrevious:
                     outString += "|spindleSpeed|"+spindleSpeed
                     spindleSpeedPrevious = spindleSpeed
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"spindleSpeed: {spindleSpeed}")
 
                 # X machine
@@ -139,6 +153,8 @@ def fetch_from_Haas():
                 if xMachine != xMachinePrevious:
                     outString += "|xMachine|"+xMachine
                     xMachinePrevious = xMachine
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"xMachine: {xMachine}")
 
                 # Y machine
@@ -146,6 +162,8 @@ def fetch_from_Haas():
                 if yMachine != yMachinePrevious:
                     outString += "|yMachine|"+yMachine
                     yMachinePrevious = yMachine
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"yMachine: {yMachine}")
 
                 # Z machine
@@ -153,6 +171,8 @@ def fetch_from_Haas():
                 if zMachine != zMachinePrevious:
                     outString += "|zMachine|"+zMachine
                     zMachinePrevious = zMachine
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"zMachine: {zMachine}")
 
                 # A machine
@@ -160,6 +180,8 @@ def fetch_from_Haas():
                 if aMachine != aMachinePrevious:
                     outString += "|aMachine|"+aMachine
                     aMachinePrevious = aMachine
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"aMachine: {aMachine}")
 
                 # B machine
@@ -167,6 +189,8 @@ def fetch_from_Haas():
                 if bMachine != bMachinePrevious:
                     outString += "|bMachine|"+bMachine
                     bMachinePrevious = bMachine
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"bMachine: {bMachine}")
 
                 # X work
@@ -174,6 +198,8 @@ def fetch_from_Haas():
                 if xWork != xWorkPrevious:
                     outString += "|xWork|"+xWork
                     xWorkPrevious = xWork
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"xWork: {xWork}")
 
                 # Y work
@@ -181,6 +207,8 @@ def fetch_from_Haas():
                 if yWork != yWorkPrevious:
                     outString += "|yWork|"+yWork
                     yWorkPrevious = yWork
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"yWork: {yWork}")
 
                 # Z work
@@ -188,6 +216,8 @@ def fetch_from_Haas():
                 if zWork != zWorkPrevious:
                     outString += "|zWork|"+zWork
                     zWorkPrevious = zWork
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"zWork: {zWork}")
 
                 # A work
@@ -195,6 +225,8 @@ def fetch_from_Haas():
                 if aWork != aWorkPrevious:
                     outString += "|aWork|"+aWork
                     aWorkPrevious = aWork
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"aWork: {aWork}")
 
                 # B work
@@ -202,11 +234,13 @@ def fetch_from_Haas():
                 if bWork != bWorkPrevious:
                     outString += "|bWork|"+bWork
                     bWorkPrevious = bWork
+                    # time stamp for more accurate readings
+                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + outString
                 print(f"bWork: {bWork}")
 
-                # Final data purge
-                combined_output = '\r\n' + datetime.datetime.now().isoformat() + 'Z' + outString
-                print(f"---> {combined_output}")
+                # Final data purge (Might not be needed)
+                # combined_output = '\r\n' + datetime.datetime.now().isoformat() + 'Z' + outString
+                # print(f"---> {combined_output}")
 
             # Error catch
             except Exception as ex:

@@ -1,6 +1,12 @@
 import serial
 import time
+import datetime
+import threading
+from queue import Queue
 
+# Variables Init
+updated_values_queue = Queue()
+lockData = threading.Lock()
 """Function that reads data from serial (through Rasp. Pi) and parses the data"""
 
 def readData(ser, HAASCode):
@@ -40,41 +46,50 @@ def readData(ser, HAASCode):
 #----------------------------------------------------------------------------------------#
 
 def fetch_from_Haas():
-        # Create serial object
+        global combined_output, lockData, updated_values_queue
+
+        # Create serial object (Note that these are the values configurable on Haas)
+        # To ensure data collection works, the values have to be matching each other.
         ser = serial.Serial(
+            # USB connection linux-based
             port = '/dev/ttyUSB0',
-            baudrate = 9600,
+            # Haas Baud Rate:50/110/200/300/600/1200/2400/4800/7200/9600/19200/38400/115200
+            baudrate = 115200,
+            # Haas RS-232 Data Bits options: SEVENBITS or 
             bytesize = serial.SEVENBITS,
-            timeout = 1,
-            xonxoff = False
+            # Haas Stop Bit options: ONE or TWO
+            stopbits = serial.STOPBITS_ONE,
+            # Currently set to xonxoff
+            xonxoff = False,
+            # Haas parity options: NONE/ZERO/EVEN/ODD
+            parity = serial.PARITY_NONE,
+            # Independent from Haas
+            timeout = 1
         )
 
-        # Buffer 
-        time.sleep(1)
-
         # Init of values to update
-        xMachinePrevious = "novalue"
+        coolantPrevious = "novalue"
 
         while True:
-            updated = False
             try:
-                # Combines all output into one at the end
-                outString = ""
+                with lockData:
+                # Coolant
+                    coolant = readData(ser, "1094")
+                    if coolant !=coolantPrevious:
+                        coolantPrevious = coolant
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|" + coolant                  
+                        print(f"bWork: {coolant}")
+                        print(combined_output)
 
-                # X machine
-                xMachine = readData(ser, "5021")
-                if xMachine != xMachinePrevious:
-                    outString += "|xMachine|"+xMachine
-                    xMachinePrevious = xMachine
-                print(f"xMachine: {xMachine}")
-
-                print(f"--------------{outString}--------------")
+                    print("-----------------------------End Cycle---------------------------------")
 
             # Error catch
             except Exception as ex:
                 print("Failed fetching values from machine: ")
                 print(ex)
                 time.sleep(2)
+
+# Run the function                
 fetch_from_Haas()
 
 

@@ -4,21 +4,23 @@ import time
 import socket
 import serial
 import datetime
+from queue import Queue
 
-# Initialization of global attributes
+# Variables Init
 client_counter = 0
 client_list = []
 first_run_flag = 1
 combined_output = ""
-lock = threading.Lock()
+updated_values_queue = Queue()
+lockData = threading.Lock()
+lockClient = threading.Lock()
 event = threading.Event()
 event.set()
 data_update_event = threading.Event()
 
-# ---------------Socket connection begins----------------#
 """Socket Objects Init"""
-HOST = "0.0.0.0" #sets to any machine on the network
-PORT = 7878 #default Port
+HOST = "0.0.0.0" # sets to any machine on the network
+PORT = 7878 # default Port
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -40,18 +42,15 @@ def clear_thread_list():
     while True:
         try:
             if client_counter == 0 and first_run_flag == 0 and client_list != []:
-                print("%d Clients Active" % client_counter)
-                # print(f"{client_counter} Clients Active") ---> more updated code
+                print(f"{client_counter} Clients Active")
                 print("Clearing All Threads....")
                 for index, thread in enumerate(client_list):
                     thread.join()
                 client_list = []
         except:
             print("Error with Client List Deletion")
-# ---------------Socket connection ends-------------------#
 
 
-# ---------------Haas Data Extraction begins--------------#
 """Function that reads data from serial (through Rasp. Pi) and parses the data"""
 
 def readData(ser, HAASCode):
@@ -60,8 +59,8 @@ def readData(ser, HAASCode):
         ser.write(bytes("?Q600 " + HAASCode + "\r\n", "ascii"))
         #print("Query ?Q600 made...")
         count = 0
-        retry_limit = 10  # Limit of retries
-        retries = 0       # Initial retry count
+        retry_limit = 10  # limit of retries
+        retries = 0       # initial retry count
 
         while True:
             count += 1
@@ -82,14 +81,15 @@ def readData(ser, HAASCode):
         value = value.split(",")[2].strip()
         #print(f"Value was split {count} and splitValue is [{value}]")
         value = value.replace(chr(23), '')
-        #print(f"Value was replaced {count} and replaceValue is [{value}]")
+
     except Exception as ex:
         print(ex)
         value = 'Unavailable'
     return value
 
 def fetch_from_Haas():
-        global combined_output, data_update_event, lock
+        global combined_output, data_update_event, lockData, updated_values_queue
+
         # Create serial object (Note that these are the values configurable on Haas)
         # To ensure data collection works, the values have to be matching each other.
         ser = serial.Serial(
@@ -109,9 +109,6 @@ def fetch_from_Haas():
             timeout = 1
         )
 
-        # Buffer for testing purposes
-        #time.sleep(1)
-
         # Init of values to update
         coolantPrevious = "novalue"
         spindleSpeedPrevious = "novalue"
@@ -128,136 +125,124 @@ def fetch_from_Haas():
 
         while True:
             try:
-                with lock:
+                with lockData:
                     # Coolant
                     coolant = readData(ser, "1094")
                     if coolant != coolantPrevious:
                         coolantPrevious = coolant
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|"+coolant
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|" + coolant
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"coolant: {coolant}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"coolant: {coolant}")
 
                     # Spindle Speed
                     spindleSpeed = readData(ser, "3027")
                     if spindleSpeed != spindleSpeedPrevious:
                         spindleSpeedPrevious = spindleSpeed
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|spindleSpeed|"+spindleSpeed
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|spindleSpeed|" + spindleSpeed
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"spindleSpeed: {spindleSpeed}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"spindleSpeed: {spindleSpeed}")
 
                     # X machine
                     xMachine = readData(ser, "5021")
                     if xMachine != xMachinePrevious:
                         xMachinePrevious = xMachine
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xMachine|"+xMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xMachine|" + xMachine
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"xMachine: {xMachine}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"xMachine: {xMachine}")
 
                     # Y machine
                     yMachine = readData(ser, "5022")
                     if yMachine != yMachinePrevious:
                         yMachinePrevious = yMachine
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yMachine|"+yMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yMachine|" + yMachine
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"yMachine: {yMachine}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"yMachine: {yMachine}")
 
                     # Z machine
                     zMachine = readData(ser, "5023")
                     if zMachine != zMachinePrevious:
                         zMachinePrevious = zMachine
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zMachine|"+zMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zMachine|" + zMachine
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"zMachine: {zMachine}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"zMachine: {zMachine}")
 
                     # A machine
                     aMachine = readData(ser, "5024")
                     if aMachine != aMachinePrevious:
                         aMachinePrevious = aMachine
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aMachine|"+aMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aMachine|" + aMachine
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"aMachine: {aMachine}")
-                    # print(f"combined output is {combined_output}")
+                        print(f"aMachine: {aMachine}")
                     
-
                     # B machine
                     bMachine = readData(ser, "5025")
                     if bMachine != bMachinePrevious:
                         bMachinePrevious = bMachine
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bMachine|"+bMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bMachine|" + bMachine
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()
-                    # print(f"bMachine: {bMachine}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"bMachine: {bMachine}")
 
                     # X work
                     xWork = readData(ser, "5041")
                     if xWork != xWorkPrevious:
                         xWorkPrevious = xWork
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xWork|"+xWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xWork|" + xWork
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()                  
-                    # print(f"xWork: {xWork}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"xWork: {xWork}") 
 
                     # Y work
                     yWork = readData(ser, "5042")
                     if yWork != yWorkPrevious:
                         yWorkPrevious = yWork
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yWork|"+yWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yWork|" + yWork
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()                    
-                    # print(f"yWork: {yWork}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"yWork: {yWork}")
 
                     # Z work
                     zWork = readData(ser, "5043")
                     if zWork != zWorkPrevious:
                         zWorkPrevious = zWork
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zWork|"+zWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zWork|" + zWork
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()                     
-                    # print(f"zWork: {zWork}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"zWork: {zWork}")
 
                     # A work
                     aWork = readData(ser, "5044")
                     if aWork != aWorkPrevious:
                         aWorkPrevious = aWork
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aWork|"+aWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aWork|" + aWork
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()                     
-                    # print(f"aWork: {aWork}")
-                    # print(f"combined output is {combined_output}")
-                    
+                        print(f"aWork: {aWork}")
 
                     # B work
                     bWork = readData(ser, "5045")
                     if bWork != bWorkPrevious:
                         bWorkPrevious = bWork
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bWork|"+bWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bWork|" + bWork
+                        updated_values_queue.put(combined_output)
                         data_update_event.set()                    
-                    # print(f"bWork: {bWork}")
-                    # print(f"combined output is {combined_output}")
+                        print(f"bWork: {bWork}")
+
+                    print("-----------------------------End Cycle---------------------------------")
 
             # Error catch
             except Exception as ex:
                 print("Failed fetching values from machine: ")
                 print(ex)
                 time.sleep(2)
-# ---------------Haas Data Extraction ends-------------------#
 
 
-
-# ---------------Threading Part begins-----------------------#
 """Main Thread Class For Clients"""
 
 
@@ -270,28 +255,20 @@ class NewClientThread(threading.Thread):
 
     # run method called on .start() execution
     def run(self):
-        global client_counter, combined_output, data_update_event, lock
-        global lock
+        global client_counter, combined_output, data_update_event, lockClient, updated_values_queue
         while True:
             try:
-                data_update_event.wait()  # wait for data to change
-                with lock:
-                    # print("Sending data to Client {} in {}".format(self.client_ip, self.getName()))
-                    out = combined_output
-                print("OUT: " + out)
+                out = updated_values_queue.get()
+                print(f"OUT: {out}")
                 self.connection_object.sendall(out.encode())
                 data_update_event.clear()
-                # time.sleep(0.5) # might not be needed with lock method
 
             except Exception as err:
-                lock.acquire()
-                try:
+                with lockClient:
                     print(err)
                     client_counter = client_counter - 1
                     print("Connection disconnected for ip {} ".format(self.client_ip))
-                    break
-                finally:
-                    lock.release()
+                break
 
 
 """Starts From Here"""
@@ -306,20 +283,18 @@ time.sleep(2)
 while event.is_set():
 
     if first_run_flag == 1:
-        print("Listening to Port: %d...." % PORT)
-
+        print(f"Listening to Port: {PORT}....")
     try:
         conn, addr = s.accept()
-        lock.acquire()
-        client_counter = client_counter + 1
-        first_run_flag = 0
-        print("Accepting Comm From:" + " " + str(addr))
-        new_Client_Thread = NewClientThread(conn, str(addr))
-        new_Client_Thread.setDaemon(True)
-        client_list.append(new_Client_Thread)
-        print(client_list)
-        new_Client_Thread.start()
-        lock.release()
+        with lockClient:
+            client_counter = client_counter + 1
+            first_run_flag = 0
+            print("Accepting Comm From:" + " " + str(addr))
+            new_Client_Thread = NewClientThread(conn, str(addr))
+            new_Client_Thread.setDaemon(True)
+            client_list.append(new_Client_Thread)
+            print(client_list)
+            new_Client_Thread.start()
     except KeyboardInterrupt:
         print("\nExiting Program")
         sys.exit()
@@ -327,4 +302,3 @@ while event.is_set():
 if not event.is_set():
     print("\nExiting Program")
     sys.exit()
-# ----------------Threading part ends------------------------#

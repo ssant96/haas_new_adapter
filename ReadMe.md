@@ -43,18 +43,19 @@ The following steps can be followed to download and install the MTConnect Agent:
 5) Run 'make'
 6) Run 'sudo make install'
 
-### How to run the adapter (Please review ReadMe.md before attempting this part)
+### How to run the adapter (Please review `$/Adapter/ReadMe.md` before attempting this part)
 
 1) SSH into the Raspberry Pi from any device.
 2) Store the 'haasAdapter.py' file at a desired location
-3) run 'python3 haasAdapter.py'
+3) Run 'python3 haasAdapter.py'
 
-### How to start the Agent (Please review ReadMe.md before attempting this part)
+### How to start the Agent (Please review `$/Agent%Config%Files/ReadMe.md` before attempting this part)
 
 1) On the device intended to run the agent, open terminal
-2) cd Documents/Agent
+2) cd Documents/Agent_Config_Files
+3) Run 'agent run agent_Haas.cfg"
 
-1) Open terminal and run Tormach_adapter.py script.
-2) Open a new terminal window and cd Documents/Tormach and run 'agent run'
-3) If accessing from local computer, simply run http://localhost:5001 on the web browser`
-4) If accessing from another computer in the same network, run http://{insertIPaddress}:5001
+### How to view data on the Agent
+1) Open any web browser on the Agent host device
+2) Access http://localhost:5001
+3) Alternatively, on any device on the same network, access http://{}

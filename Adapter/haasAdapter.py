@@ -7,36 +7,36 @@ import datetime
 from queue import Queue
 
 # Variables Init
-client_counter = 0
-client_list = []
-first_run_flag = 1
-combined_output = ""
-updated_values_queue = Queue()
-lockData = threading.Lock()
-lockClient = threading.Lock()
-event = threading.Event()
-event.set()
-data_update_event = threading.Event()
+client_counter = 0 # Counter for number of connected clients
+client_list = [] # List of client threads
+first_run_flag = 1 # Flag to check if it is the first run of the script
+combined_output = "" # Variable to store combined output
+updated_values_queue = Queue() # Queue to store updated values from Haas
+lockData = threading.Lock() # Lock object to ensure thread-safe operations for data
+lockClient = threading.Lock() # Lock object to ensure thread-safe operations for client
+event = threading.Event() # Event object to manage state of the script
+data_update_event = threading.Event() # Event object to manage updates of data from fetch_from_haas to newClientThread
+event.set() # Sets initial state of event
 
 """Socket Objects Init"""
-HOST = "0.0.0.0" # sets to any machine on the network
-PORT = 7878 # default Port
+HOST = "0.0.0.0" # Accepts connections from all network interfaces
+PORT = 7878 # Port number to listen on
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-"""Binding to the local port/host"""
+"""Binding socket to specified host and port"""
 try:
     s.bind((HOST, PORT))
 except socket.error as msg:
     print("Binding to local port/host failed. Error code: " + str(msg[0]) + " Message " + msg[1])
     sys.exit()
 
-"""Starts Listening to Socket for Clients"""
+"""Starts Listening for Incoming Client Connections"""
 s.listen(5)
 
-"""Function to Clear OUT Threads List Once All Threads are Empty"""
 def clear_thread_list():
+    """Clears the thread list once all threads are empty."""
     global client_list, client_counter
 
     while True:
@@ -51,35 +51,35 @@ def clear_thread_list():
             print("Error with Client List Deletion")
 
 
-"""Function that reads data from serial (through Rasp. Pi) and parses the data"""
 
 def readData(ser, HAASCode):
+    """Reads and parses data from serial
+    
+    Args:
+        ser: Serial object for data reading.
+        HAASCode: Haas codes for specific variables queries
+    
+    Returns:
+        Parsed value if available, otherwise queried variables are 'Unavailable'
+    """
     try:
-        #print("Inside readData loop...")
         ser.write(bytes("?Q600 " + HAASCode + "\r\n", "ascii"))
-        #print("Query ?Q600 made...")
-        count = 0
-        retry_limit = 10  # limit of retries
-        retries = 0       # initial retry count
+        retry_limit = 10  # Limit of retries
+        retries = 0       # Initial retry count
 
         while True:
-            count += 1
-            #print("Inside while loop")
             value = ser.readline().decode("utf-8").strip()
-            #print(f"Value decoded {count} and value is [{value}]")
 
             if len(value) > 4:
-                #print("broke")
                 break
             
-            # Increment retries count and check if limit is reached
+            # Retry block helps continuous data gathering if Haas switches program
             retries += 1
             if retries >= retry_limit:
                 print("Retry limit reached.")
                 return "Unavailable"
 
         value = value.split(",")[2].strip()
-        #print(f"Value was split {count} and splitValue is [{value}]")
         value = value.replace(chr(23), '')
 
     except Exception as ex:
@@ -88,10 +88,14 @@ def readData(ser, HAASCode):
     return value
 
 def fetch_from_Haas():
+        """Fetches real-time data from Haas
+
+        This function continuous fetches updated data from the Haas and pushes the updated data
+        to a queue to send to client/s
+        """
         global combined_output, data_update_event, lockData, updated_values_queue
 
-        # Create serial object (Note that these are the values configurable on Haas)
-        # To ensure data collection works, the values have to be matching each other.
+        # Create serial object with only variables and all options available to configure on Haas
         ser = serial.Serial(
             # USB connection linux-based
             port = '/dev/ttyUSB0',
@@ -130,7 +134,7 @@ def fetch_from_Haas():
                     coolant = readData(ser, "1094")
                     if coolant != coolantPrevious:
                         coolantPrevious = coolant
-                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|" + coolant
+                        combined_output = '\r\n' + datetime.datetime.now().isoformat() + 'Z' + "|coolant|" + coolant 
                         updated_values_queue.put(combined_output)
                         data_update_event.set()
                         print(f"coolant: {coolant}")
@@ -243,10 +247,16 @@ def fetch_from_Haas():
                 time.sleep(2)
 
 
-"""Main Thread Class For Clients"""
-
-
 class NewClientThread(threading.Thread):
+    """Thread class that handles new clients
+
+    Class extends threading.Thread and overwrites the run method
+    to handle data for each connected client.
+
+    Args:
+        conn: Connection object for the client
+        string_address: IP address if the client as a string
+    """
     # init method called on thread object creation,
     def __init__(self, conn, string_address):
         threading.Thread.__init__(self)
@@ -271,7 +281,7 @@ class NewClientThread(threading.Thread):
                 break
 
 
-"""Starts From Here"""
+"""Main Script Execution"""
 t1 = threading.Thread(target=clear_thread_list)
 t2 = threading.Thread(target=fetch_from_Haas)
 t1.setDaemon(True)

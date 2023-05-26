@@ -1,0 +1,60 @@
+# Digitally Connected Manufacturing: A 2023 MTConnect Use Case Study at the Virginia Tech Learning Factory
+
+An improved working to the existing vtech-learningfactory-haas-adapter (https://github.com/mtconnect/vtech-learningfactory-haas-adapter).
+
+The main goal of the Learning Factory is to implement industry 4.0 across the available machines present. In goal of this project is to implement a new adapter that successfully reads data from a Haas VF-3. In the current setup as of 2023, the Haas is connected to a Raspberry Pi (linux-based) connected through USB port to the Haas (RS-232 connection). 
+
+
+Changes mades:
+1. Successfully reads data through serial port connection
+2. Data output to Agent method changed for better accuracy. Instead of a string of variables and their own output all at the end, each variable is sent as soon as it refreshes, thus increasing time stamp accuracy
+3. Added thread lock to avoid data race 
+4. Added a new readData function that reads Haas serialized codes, and also fixes issue of switching program on Haas which causes code to crash
+5. Improved serial connection block with only values that can be configured and are available on the Haas with all the available options
+6. Added queue method to ensure that all data read is being sent out to the agent
+7. Better error handling
+
+## Browsing this Repository
+
+The work on this project can be divided into discrete components, **each with its own folder and Readme file**:
+1. The **Adapter**: contains the main adapter which is intended to be ran in the Raspberry Pi
+2. **Agent Config Files** contains the xml schema for the Haas, the Learning Factory's xml schema for both the Haas and UR5, and the agent_Haas.cfg configuration file for the agent.
+
+This project was built to comply with MTConnect version 1.8; for more information on the MTConnect standard and MTConnect Agent, please see [MTConnect's official documentation](https://www.mtconnect.org/documents).
+
+Each component is covered in more detail in its own Readme file, i.e. `$/Adapter/ReadMe.md`.
+
+## Installing the MTConnect Agent
+
+**NOTE: This project used MTConnect Agent Version 1.8.0.3**
+**In this specific environment, the MTConnect Agent Version 1.8.0.3 was installed in a custom PC with the following specs:**
+- CPU: Intel Xeon E5-2650
+- GPU: Nvidia GTX 690
+- RAM: 128GB
+- Storage: 1 TB
+- OS: Ubuntu Linux (20.04.1 SMP)
+
+The following steps can be followed to download and install the MTConnect Agent:
+
+1) Download MTConnect Agent from https://github.com/mtconnect/cppagent/releases?q=1.8.0.3&expanded=true
+2) Extract and move ‘cppagent-1.8.0.3’ folder to Documents
+3) Make a folder called ‘build’ inside ‘cppagent-1.8.0.3’ folder
+4) Open terminal and cd Documents>cppagent-1.8.0.3>build and run 'cmake'
+5) Run 'make'
+6) Run 'sudo make install'
+
+### How to run the adapter (Please review ReadMe.md before attempting this part)
+
+1) SSH into the Raspberry Pi from any device.
+2) Store the 'haasAdapter.py' file at a desired location
+3) run 'python3 haasAdapter.py'
+
+### How to start the Agent (Please review ReadMe.md before attempting this part)
+
+1) On the device intended to run the agent, open terminal
+2) cd Documents/Agent
+
+1) Open terminal and run Tormach_adapter.py script.
+2) Open a new terminal window and cd Documents/Tormach and run 'agent run'
+3) If accessing from local computer, simply run http://localhost:5001 on the web browser`
+4) If accessing from another computer in the same network, run http://{insertIPaddress}:5001

@@ -268,6 +268,7 @@ class NewClientThread(threading.Thread):
                     print("OUT: " + out)
                     self.connection_object.sendall(out.encode())
                     combined_outputPrevious = combined_output
+                    time.sleep(0.5)
 
             except Exception as err:
                 lock.acquire()

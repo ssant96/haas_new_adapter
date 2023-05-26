@@ -89,7 +89,7 @@ def readData(ser, HAASCode):
     return value
 
 def fetch_from_Haas():
-        global combined_output, data_update_event
+        global combined_output, data_update_event, lock
         # Create serial object (Note that these are the values configurable on Haas)
         # To ensure data collection works, the values have to be matching each other.
         ser = serial.Serial(
@@ -128,124 +128,125 @@ def fetch_from_Haas():
 
         while True:
             try:
-                # Coolant
-                coolant = readData(ser, "1094")
-                if coolant != coolantPrevious:
-                    coolantPrevious = coolant
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|"+coolant
-                    data_update_event.set()
-                # print(f"coolant: {coolant}")
-                # print(f"combined output is {combined_output}")
-                 
+                with lock:
+                    # Coolant
+                    coolant = readData(ser, "1094")
+                    if coolant != coolantPrevious:
+                        coolantPrevious = coolant
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|coolant|"+coolant
+                        data_update_event.set()
+                    # print(f"coolant: {coolant}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # Spindle Speed
-                spindleSpeed = readData(ser, "3027")
-                if spindleSpeed != spindleSpeedPrevious:
-                    spindleSpeedPrevious = spindleSpeed
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|spindleSpeed|"+spindleSpeed
-                    data_update_event.set()
-                # print(f"spindleSpeed: {spindleSpeed}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # Spindle Speed
+                    spindleSpeed = readData(ser, "3027")
+                    if spindleSpeed != spindleSpeedPrevious:
+                        spindleSpeedPrevious = spindleSpeed
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|spindleSpeed|"+spindleSpeed
+                        data_update_event.set()
+                    # print(f"spindleSpeed: {spindleSpeed}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # X machine
-                xMachine = readData(ser, "5021")
-                if xMachine != xMachinePrevious:
-                    xMachinePrevious = xMachine
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xMachine|"+xMachine
-                    data_update_event.set()
-                # print(f"xMachine: {xMachine}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # X machine
+                    xMachine = readData(ser, "5021")
+                    if xMachine != xMachinePrevious:
+                        xMachinePrevious = xMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xMachine|"+xMachine
+                        data_update_event.set()
+                    # print(f"xMachine: {xMachine}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # Y machine
-                yMachine = readData(ser, "5022")
-                if yMachine != yMachinePrevious:
-                    yMachinePrevious = yMachine
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yMachine|"+yMachine
-                    data_update_event.set()
-                # print(f"yMachine: {yMachine}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # Y machine
+                    yMachine = readData(ser, "5022")
+                    if yMachine != yMachinePrevious:
+                        yMachinePrevious = yMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yMachine|"+yMachine
+                        data_update_event.set()
+                    # print(f"yMachine: {yMachine}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # Z machine
-                zMachine = readData(ser, "5023")
-                if zMachine != zMachinePrevious:
-                    zMachinePrevious = zMachine
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zMachine|"+zMachine
-                    data_update_event.set()
-                # print(f"zMachine: {zMachine}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # Z machine
+                    zMachine = readData(ser, "5023")
+                    if zMachine != zMachinePrevious:
+                        zMachinePrevious = zMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zMachine|"+zMachine
+                        data_update_event.set()
+                    # print(f"zMachine: {zMachine}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # A machine
-                aMachine = readData(ser, "5024")
-                if aMachine != aMachinePrevious:
-                    aMachinePrevious = aMachine
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aMachine|"+aMachine
-                    data_update_event.set()
-                # print(f"aMachine: {aMachine}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # A machine
+                    aMachine = readData(ser, "5024")
+                    if aMachine != aMachinePrevious:
+                        aMachinePrevious = aMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aMachine|"+aMachine
+                        data_update_event.set()
+                    # print(f"aMachine: {aMachine}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # B machine
-                bMachine = readData(ser, "5025")
-                if bMachine != bMachinePrevious:
-                    bMachinePrevious = bMachine
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bMachine|"+bMachine
-                    data_update_event.set()
-                # print(f"bMachine: {bMachine}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # B machine
+                    bMachine = readData(ser, "5025")
+                    if bMachine != bMachinePrevious:
+                        bMachinePrevious = bMachine
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bMachine|"+bMachine
+                        data_update_event.set()
+                    # print(f"bMachine: {bMachine}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # X work
-                xWork = readData(ser, "5041")
-                if xWork != xWorkPrevious:
-                    xWorkPrevious = xWork
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xWork|"+xWork
-                    data_update_event.set()                  
-                # print(f"xWork: {xWork}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # X work
+                    xWork = readData(ser, "5041")
+                    if xWork != xWorkPrevious:
+                        xWorkPrevious = xWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|xWork|"+xWork
+                        data_update_event.set()                  
+                    # print(f"xWork: {xWork}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # Y work
-                yWork = readData(ser, "5042")
-                if yWork != yWorkPrevious:
-                    yWorkPrevious = yWork
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yWork|"+yWork
-                    data_update_event.set()                    
-                # print(f"yWork: {yWork}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # Y work
+                    yWork = readData(ser, "5042")
+                    if yWork != yWorkPrevious:
+                        yWorkPrevious = yWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|yWork|"+yWork
+                        data_update_event.set()                    
+                    # print(f"yWork: {yWork}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # Z work
-                zWork = readData(ser, "5043")
-                if zWork != zWorkPrevious:
-                    zWorkPrevious = zWork
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zWork|"+zWork
-                    data_update_event.set()                     
-                # print(f"zWork: {zWork}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # Z work
+                    zWork = readData(ser, "5043")
+                    if zWork != zWorkPrevious:
+                        zWorkPrevious = zWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|zWork|"+zWork
+                        data_update_event.set()                     
+                    # print(f"zWork: {zWork}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # A work
-                aWork = readData(ser, "5044")
-                if aWork != aWorkPrevious:
-                    aWorkPrevious = aWork
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aWork|"+aWork
-                    data_update_event.set()                     
-                # print(f"aWork: {aWork}")
-                # print(f"combined output is {combined_output}")
-                 
+                    # A work
+                    aWork = readData(ser, "5044")
+                    if aWork != aWorkPrevious:
+                        aWorkPrevious = aWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|aWork|"+aWork
+                        data_update_event.set()                     
+                    # print(f"aWork: {aWork}")
+                    # print(f"combined output is {combined_output}")
+                    
 
-                # B work
-                bWork = readData(ser, "5045")
-                if bWork != bWorkPrevious:
-                    bWorkPrevious = bWork
-                    combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bWork|"+bWork
-                    data_update_event.set()                    
-                # print(f"bWork: {bWork}")
-                # print(f"combined output is {combined_output}")
+                    # B work
+                    bWork = readData(ser, "5045")
+                    if bWork != bWorkPrevious:
+                        bWorkPrevious = bWork
+                        combined_output = '\r\n'+ datetime.datetime.now().isoformat() + 'Z' + "|bWork|"+bWork
+                        data_update_event.set()                    
+                    # print(f"bWork: {bWork}")
+                    # print(f"combined output is {combined_output}")
 
             # Error catch
             except Exception as ex:
@@ -269,16 +270,18 @@ class NewClientThread(threading.Thread):
 
     # run method called on .start() execution
     def run(self):
-        global client_counter, combined_output, data_update_event
+        global client_counter, combined_output, data_update_event, lock
         global lock
         while True:
             try:
-                # print("Sending data to Client {} in {}".format(self.client_ip, self.getName()))
                 data_update_event.wait()  # wait for data to change
-                out = combined_output
+                with lock:
+                    # print("Sending data to Client {} in {}".format(self.client_ip, self.getName()))
+                    out = combined_output
                 print("OUT: " + out)
                 self.connection_object.sendall(out.encode())
                 data_update_event.clear()
+                # time.sleep(0.5) # might not be needed with lock method
 
             except Exception as err:
                 lock.acquire()

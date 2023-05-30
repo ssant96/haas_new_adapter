@@ -4,14 +4,17 @@
 
 *Please review ReadMe.md in this project's root directory before this file for context.*
 
+The agent serves the purpose of showcasing the data in a web UI that can be accessed once the configuration files are properly located and configured. The agent is a simple server host that will listen to socket communication and receive and display the data according to the configured schema defined in the XML schema, which in this case would be Haas.xml.
+
 **Before running the agent, create a new folder called ‘Agent_Config_Files’ in the Documents folder where Haas.xml and agent_Haas.cfg will be stored.**
 
-‘Tormach.xml’ serves the purpose of shaping the MTConnect UI to every machine, type and value that is assigned from the Adapter to the Agent. In simple words, it serves as the translator or intermediary between the Adapter and Agent.
-  
+‘Haas.xml’ serves the purpose of shaping the MTConnect UI to every machine, type and value that is assigned from the Adapter to the Agent. In simple words, it serves as the translator or intermediary between the Adapter and Agent.
+---
+
+## Agent_Haas.cfg
 
 ‘agent.cfg’ should be configured to match the port and file path. The following is the header and it is important to specify SchemaVersion to be 1.7 so it matches the XML schema. Port was assigned to 5001 but the default is 5000.
 
-  
 
 	Devices = ./Haas.xml
 	AllowPut = true
@@ -23,9 +26,8 @@
 	Port = 5001
 	MinimumConfigReloadAge = 30
 
-  
 
-In this part, the host is the IP address of the machine in use. This port will be important when the MTConnect web UI is being accessed from another computer in the local network.
+In this part, the host is the IP address of the adapter's host device. Please ensure the IP address is correct as this is where the data is going to come from to the agent.
 
   
 
@@ -40,7 +42,7 @@ In this part, the host is the IP address of the machine in use. This port will b
 
   
 
-Lastly, this step is important for the agent to work. Since ‘cppagent-1.8.0.3’ folder and ‘Tormach’ folder are both in one folder (‘Documents’), the configuration should be the following:
+Lastly, this step is important for the agent to work. Since ‘cppagent-1.8.0.3’ folder and ‘Agent Config Files’ folder are both in one folder (‘Documents’), the configuration should be the following:
 
   
 
@@ -59,10 +61,11 @@ Lastly, this step is important for the agent to work. Since ‘cppagent-1.8.0.3�
         }
 	}
 
----
-### How to start the Agent
+To start the Agent, please follow instructions on root directory's ReadMe.md
 
-1) Open terminal and run Tormach_adapter.py script.
-2) Open a new terminal window and cd Documents/Tormach and run 'agent run'
-3) If accessing from local computer, simply run http://localhost:5001 on the web browser`
-4) If accessing from another computer in the same network, run http://{insertIPaddress}:5001
+---
+## Haas.xml
+
+The xml schema is needed to shape the UI agent access. It is important to name the variables properly and ensure it matches the MTConnect standard namings.
+For more information, please refer to https://model.mtconnect.org/ for how to manage each variable.
+Moreover, ensure the variable names being outputted from the haasAdapter.py match the ones on the xml schema.

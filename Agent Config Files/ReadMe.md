@@ -68,5 +68,5 @@ To start the Agent, please follow instructions on root directory's ReadMe.md
 ## Haas.xml
 
 The xml schema is needed to shape the UI agent access. It is important to name the variables properly and ensure it matches the MTConnect standard namings.
-For more information, please refer to https://model.mtconnect.org/ for how to manage each variable.
+For more information, please refer to [MTConnect's model browser](https://model.mtconnect.org/) for how to manage each variable.
 Moreover, ensure the variable names being outputted from the haasAdapter.py match the ones on the xml schema.

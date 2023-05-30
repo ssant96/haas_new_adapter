@@ -41,7 +41,7 @@ Each component is covered in more detail in its own Readme file
 
 The following steps can be followed to download and install the MTConnect Agent:
 
-1) Download MTConnect Agent from https://github.com/mtconnect/cppagent/releases?q=1.8.0.3&expanded=true
+1) [Download MTConnect Agent 1.8.0.3](https://github.com/mtconnect/cppagent/releases?q=1.8.0.3&expanded=true)
 2) Extract and move ‘cppagent-1.8.0.3’ folder to Documents
 3) Make a folder called ‘build’ inside ‘cppagent-1.8.0.3’ folder
 4) Open terminal and cd Documents>cppagent-1.8.0.3>build and run 'cmake'

@@ -1,7 +1,7 @@
 # Digitally Connected Manufacturing: A 2023 MTConnect Use Case Study at the Virginia Tech Learning Factory
 
 ## Introduction
-An improved working to the existing vtech-learningfactory-haas-adapter (https://github.com/mtconnect/vtech-learningfactory-haas-adapter).
+An improved working adapter to the existing [vtech-learningfactory-haas-adapter](https://github.com/mtconnect/vtech-learningfactory-haas-adapter)
 
 The main goal of the Learning Factory is to implement industry 4.0 across the available machines present. This project is to improve, design, test and implement a new adapter that successfully reads data from a Haas VF-3. 
 
@@ -33,7 +33,7 @@ The work on this project can be divided into discrete components, **each with it
 
 This project was built to comply with MTConnect version 1.8; for more information on the MTConnect standard and MTConnect Agent, please see [MTConnect's official documentation](https://www.mtconnect.org/documents).
 
-Each component is covered in more detail in its own Readme file, i.e. `$/Adapter/ReadMe.md`.
+Each component is covered in more detail in its own Readme file
 ---
 
 ## Installing the MTConnect Agent
@@ -51,7 +51,7 @@ The following steps can be followed to download and install the MTConnect Agent:
 ### How to run the adapter (Please review Adapter>ReadMe.md before attempting this part)
 1) SSH into the Raspberry Pi from any device
 2) Store the 'haasAdapter.py' file at a desired location
-3) Run 'python3 haasAdapter.py'
+3) Run 'python haasAdapter.py' or 'python3 haasAdapter.py'
 
 ### How to start the Agent (Please review Agent Config Files>ReadMe.md before attempting this part)
 1) On the device intended to run the agent, open terminal

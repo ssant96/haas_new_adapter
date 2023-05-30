@@ -1,10 +1,11 @@
-# VT Learning Factory's Haas VF-3 Adapter
+# Adapter
   
 ## Introduction
 
 *Please review ReadMe.md in this project's root directory before this file for context.*
 
-The adapter's purpose is to gather data from the targeted machine, format it and send it out to the agent through whichever port configured.
+The adapter's purpose is to gather data from the targeted machine, format it and send it out to the agent through whichever port configured
+
 ---
   
 ## New changes
@@ -24,5 +25,6 @@ From the changes made in the root level ReadMe.md, the following is a detailed d
 
 ### How to run the adapter
 
-At the Learning Factory, the adapter file is currently running in the Raspberry Pi which is connected to the Learning Factory's Wi-Fi. To run it, simply have python installed and run 'python haasAdapter.py' or 'python3 haasAdapter.py' depending on your system. If the values are being read correctly, the script should print out the values being read and the values being outputted (values followed by the "OUT:")
-If the configuration files were set up correctly, accessing localhost:5001 or whichever port specified, should show on the agent that the values were correctly received.
+At the Learning Factory, the adapter file is currently running in the Raspberry Pi which is connected to the Learning Factory's Wi-Fi. To run it, simply have python installed and run 'python haasAdapter.py' or 'python3 haasAdapter.py' depending on your system. 
+- If the values are being read correctly, the script should print out the values being read and the values being outputted (values followed by the "OUT:")
+- If the configuration files were set up correctly, accessing localhost:5001 or whichever port specified, should show on the agent that the values were correctly received.

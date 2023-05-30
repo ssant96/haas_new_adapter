@@ -1,4 +1,4 @@
-### Configuring the Agent
+# Agent configuration and usage
 
 ## Introduction
 
@@ -9,6 +9,7 @@ The agent serves the purpose of showcasing the data in a web UI that can be acce
 **Before running the agent, create a new folder called ‘Agent_Config_Files’ in the Documents folder where Haas.xml and agent_Haas.cfg will be stored.**
 
 ‘Haas.xml’ serves the purpose of shaping the MTConnect UI to every machine, type and value that is assigned from the Adapter to the Agent. In simple words, it serves as the translator or intermediary between the Adapter and Agent.
+
 ---
 
 ## Agent_Haas.cfg

@@ -54,6 +54,6 @@ Looking at the combined_output line , the format is shown as '\r\n' + iso date t
 
 ### How to run the adapter
 
-At the Learning Factory, the adapter file is currently running in the Raspberry Pi which is connected to the Learning Factory's Wi-Fi. To run it, simply have python installed and run 'python haasAdapter.py' or 'python3 haasAdapter.py' depending on your system. 
+At the Learning Factory, the adapter file is currently running in the Raspberry Pi which is connected to the Learning Factory's Wi-Fi. To run it, simply have python and PySerial installed and run 'python haasAdapter.py' or 'python3 haasAdapter.py' depending on your system. 
 - If the values are being read correctly, the script should print out the values being read and the values being outputted (values followed by the "OUT:")
 - If the configuration files were set up correctly, accessing localhost:5001 or whichever port specified, should show on the agent that the values were correctly received.

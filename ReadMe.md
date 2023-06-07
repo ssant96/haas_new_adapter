@@ -62,4 +62,4 @@ The following steps can be followed to download and install the MTConnect Agent:
 ### How to view data on the Agent
 1) Open any web browser on the Agent host device
 2) Access http://localhost:5001
-3) Alternatively, on any device on the same network, access http://{hostIPaddress:5001}
+3) Alternatively, on any device on the same network, access http://{hostIPaddress}:5001
